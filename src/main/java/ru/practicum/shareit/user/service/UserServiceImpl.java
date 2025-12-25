@@ -14,12 +14,13 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
+    private final UserMapper userMapper;
 
     @Override
     public UserDto create(UserDto userDto) {
         checkEmailUnique(userDto.getEmail(), null);
-        User user = UserMapper.toModel(userDto);
-        return UserMapper.toDto(userStorage.create(user));
+        User user = userMapper.toModel(userDto);
+        return userMapper.toDto(userStorage.create(user));
     }
 
     @Override
@@ -33,18 +34,18 @@ public class UserServiceImpl implements UserService {
             updated.setEmail(userDto.getEmail());
         }
 
-        return UserMapper.toDto(userStorage.update(updated));
+        return userMapper.toDto(userStorage.update(updated));
     }
 
     @Override
     public UserDto getById(Long userId) {
-        return UserMapper.toDto(userStorage.getById(userId));
+        return userMapper.toDto(userStorage.getById(userId));
     }
 
     @Override
     public List<UserDto> getAll() {
         return userStorage.getAll().stream()
-                .map(UserMapper::toDto)
+                .map(userMapper::toDto)
                 .collect(Collectors.toList());
     }
 

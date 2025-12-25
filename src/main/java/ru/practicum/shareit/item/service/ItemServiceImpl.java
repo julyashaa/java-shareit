@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
     private final UserStorage userStorage;
+    private final ItemMapper itemMapper;
 
     @Override
     public ItemDto add(Long ownerId, ItemDto itemDto) {
@@ -24,11 +25,11 @@ public class ItemServiceImpl implements ItemService {
             throw new NoSuchElementException("Пользователь с id = " + ownerId + " не найден");
         }
         userStorage.getById(ownerId);
-        Item item = ItemMapper.toModel(itemDto);
+        Item item = itemMapper.toModel(itemDto);
         item.setOwnerId(ownerId);
         Item saved = itemStorage.add(item);
 
-        return ItemMapper.toDto(saved);
+        return itemMapper.toDto(saved);
     }
 
     @Override
@@ -54,27 +55,27 @@ public class ItemServiceImpl implements ItemService {
 
         itemStorage.update(updated);
 
-        return ItemMapper.toDto(updated);
+        return itemMapper.toDto(updated);
     }
 
     @Override
     public ItemDto getById(Long ownerId, Long itemId) {
         userStorage.getById(ownerId);
-        return ItemMapper.toDto(itemStorage.getById(itemId));
+        return itemMapper.toDto(itemStorage.getById(itemId));
     }
 
     @Override
     public List<ItemDto> getAll(Long ownerId) {
         userStorage.getById(ownerId);
         return itemStorage.getAllByOwner(ownerId).stream()
-                .map(ItemMapper::toDto)
+                .map(itemMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<ItemDto> search(String text) {
         return itemStorage.searchAvailable(text).stream()
-                .map(ItemMapper::toDto)
+                .map(itemMapper::toDto)
                 .collect(Collectors.toList());
     }
 }
