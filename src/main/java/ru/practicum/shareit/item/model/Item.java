@@ -9,7 +9,8 @@ import ru.practicum.shareit.user.model.User;
  */
 @Entity
 @Table(name = "items")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
