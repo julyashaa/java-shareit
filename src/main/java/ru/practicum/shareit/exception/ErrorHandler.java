@@ -15,4 +15,22 @@ public class ErrorHandler {
     public Map<String, String> handleNotFound(NoSuchElementException e) {
         return Map.of("error", e.getMessage());
     }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, String> handleAccessDenied(AccessDeniedException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequest(IllegalArgumentException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler(Throwable.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleThrowable(Throwable e) {
+        return Map.of("error", e.getMessage());
+    }
 }

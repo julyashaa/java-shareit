@@ -1,13 +1,12 @@
 package ru.practicum.shareit.item.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Repository
+
 @RequiredArgsConstructor
 public class InMemoryItemStorage implements ItemStorage {
     private final Map<Long, Item> items = new HashMap<>();
@@ -38,7 +37,8 @@ public class InMemoryItemStorage implements ItemStorage {
     @Override
     public List<Item> getAllByOwner(Long ownerId) {
         return items.values().stream()
-                .filter(item -> item.getOwnerId().equals(ownerId))
+                .filter(item -> item.getOwner() != null
+                        && java.util.Objects.equals(item.getOwner().getId(), ownerId))
                 .sorted(Comparator.comparing(Item::getId))
                 .collect(Collectors.toList());
     }

@@ -3,6 +3,9 @@ package ru.practicum.shareit.item.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
+
+import java.util.List;
 
 /**
  * TODO Sprint add-controllers.
@@ -21,4 +24,9 @@ public class ItemDto {
     private Boolean available;
 
     private Long requestId;
+
+    private BookingShortDto lastBooking;
+    private BookingShortDto nextBooking;
+
+    private List<CommentDto> comments;
 }
