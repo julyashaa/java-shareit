@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class ItemRequestServiceImplIT {
+public class ItemRequestServiceImplTest {
     @Autowired
     private ItemRequestService requestService;
 

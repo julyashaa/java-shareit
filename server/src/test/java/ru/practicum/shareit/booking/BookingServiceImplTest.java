@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class BookingServiceImplIT {
+public class BookingServiceImplTest {
     @Autowired
     private BookingService bookingService;
     @Autowired
