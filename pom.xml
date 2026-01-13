@@ -100,6 +100,19 @@
                     <version>${jacoco.version}</version>
                     <configuration>
                         <output>file</output>
+
+                        <excludes>
+                            <!-- main class -->
+                            <exclude>**/*App*</exclude>
+                            <exclude>**/*Application*</exclude>
+
+                            <!-- мапперы / модели -->
+                            <exclude>**/*Mapper*</exclude>
+                            <exclude>**/model/**</exclude>
+
+                            <!-- слой хранения -->
+                            <exclude>**/storage/**</exclude>
+                        </excludes>
                     </configuration>
                     <executions>
                         <execution>
