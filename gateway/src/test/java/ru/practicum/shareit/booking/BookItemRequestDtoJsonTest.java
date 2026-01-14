@@ -81,4 +81,3 @@ class BookItemRequestDtoJsonTest {
                 .anyMatch(v -> v.getPropertyPath().toString().equals("end"));
     }
 }
-
