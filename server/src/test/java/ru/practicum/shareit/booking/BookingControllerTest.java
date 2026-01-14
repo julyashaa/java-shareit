@@ -26,13 +26,17 @@ class BookingControllerTest {
 
     private static final String USER_HEADER = "X-Sharer-User-Id";
 
-    @Autowired
-    private MockMvc mockMvc;
-    @Autowired
-    private ObjectMapper objectMapper;
+    private final MockMvc mockMvc;
+    private final ObjectMapper objectMapper;
 
     @MockBean
     private BookingService bookingService;
+
+    @Autowired
+    BookingControllerTest(MockMvc mockMvc, ObjectMapper objectMapper) {
+        this.mockMvc = mockMvc;
+        this.objectMapper = objectMapper;
+    }
 
     @Test
     void createShouldReturn200AndCallService() throws Exception {

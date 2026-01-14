@@ -24,7 +24,7 @@ class ItemRequestDtoJsonTest {
         dto.setId(10L);
         dto.setDescription("Need a drill");
         dto.setCreated(LocalDateTime.of(2026, 1, 1, 10, 0));
-        dto.setItems(List.of()); // важно: items присутствует
+        dto.setItems(List.of());
 
         JsonContent<ItemRequestDto> result = json.write(dto);
 

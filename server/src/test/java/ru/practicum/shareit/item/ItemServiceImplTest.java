@@ -166,7 +166,7 @@ public class ItemServiceImplTest {
         patch.setName("Hacked");
 
         assertThatThrownBy(() -> itemService.update(other.getId(), item.getId(), patch))
-                .isInstanceOf(RuntimeException.class); // <- замени на свое исключение
+                .isInstanceOf(RuntimeException.class);
     }
 
     @Test
@@ -274,7 +274,6 @@ public class ItemServiceImplTest {
                 .owner(owner)
                 .build());
 
-        // бронирование в будущем -> не завершено, коммент нельзя
         LocalDateTime now = LocalDateTime.now();
         bookingRepository.save(Booking.builder()
                 .item(item)

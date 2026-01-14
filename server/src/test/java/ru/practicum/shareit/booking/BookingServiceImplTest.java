@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,22 +28,43 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @ActiveProfiles("test")
 @Transactional
 public class BookingServiceImplTest {
+    private final BookingService bookingService;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
+    private final ItemRepository itemRepository;
+
     @Autowired
-    private BookingService bookingService;
-    @Autowired
-    private BookingRepository bookingRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ItemRepository itemRepository;
+    BookingServiceImplTest(
+            BookingService bookingService,
+            BookingRepository bookingRepository,
+            UserRepository userRepository,
+            ItemRepository itemRepository) {
+        this.bookingService = bookingService;
+        this.bookingRepository = bookingRepository;
+        this.userRepository = userRepository;
+        this.itemRepository = itemRepository;
+    }
+
+    private static final String OWNER_NAME = "Owner";
+    private static final String BOOKER_NAME = "Booker";
+    private static final String OTHER_NAME = "Other";
+    private static final String OWNER_EMAIL = "owner@mail.com";
+    private static final String BOOKER_EMAIL = "booker@mail.com";
+    private static final String OTHER_EMAIL = "other@mail.com";
+    private static final String DRILL_NAME = "Drill";
+
+    private LocalDateTime now;
+
+    @BeforeEach
+    void initNow() {
+        now = LocalDateTime.now();
+    }
 
     @Test
     void createShouldSaveBookingWithWaitingStatus() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         BookingCreateRequestDto dto = new BookingCreateRequestDto();
         dto.setItemId(item.getId());
@@ -62,10 +84,8 @@ public class BookingServiceImplTest {
 
     @Test
     void createShouldFailWhenOwnerBooksOwnItem() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         BookingCreateRequestDto dto = new BookingCreateRequestDto();
         dto.setItemId(item.getId());
@@ -79,11 +99,9 @@ public class BookingServiceImplTest {
 
     @Test
     void createShouldFailWhenItemNotAvailable() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", false);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, false);
 
         BookingCreateRequestDto dto = new BookingCreateRequestDto();
         dto.setItemId(item.getId());
@@ -97,16 +115,14 @@ public class BookingServiceImplTest {
 
     @Test
     void createShouldFailWhenDatesInvalidStartNotBeforeEnd() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         BookingCreateRequestDto dto = new BookingCreateRequestDto();
         dto.setItemId(item.getId());
         dto.setStart(now.plusDays(2));
-        dto.setEnd(now.plusDays(2)); // start == end
+        dto.setEnd(now.plusDays(2));
 
         assertThatThrownBy(() -> bookingService.create(booker.getId(), dto))
                 .isInstanceOf(IllegalArgumentException.class)
@@ -115,11 +131,9 @@ public class BookingServiceImplTest {
 
     @Test
     void createShouldFailWhenStartInPast() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         BookingCreateRequestDto dto = new BookingCreateRequestDto();
         dto.setItemId(item.getId());
@@ -133,11 +147,9 @@ public class BookingServiceImplTest {
 
     @Test
     void approveShouldSetApprovedWhenOwnerApproves() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.WAITING);
@@ -151,12 +163,10 @@ public class BookingServiceImplTest {
 
     @Test
     void approveShouldFailWhenNotOwner() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        User other = saveUser("Other", "other@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        User other = saveUser(OTHER_NAME, OTHER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.WAITING);
@@ -168,11 +178,9 @@ public class BookingServiceImplTest {
 
     @Test
     void approveShouldFailWhenDecisionAlreadyMade() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.WAITING);
@@ -186,11 +194,9 @@ public class BookingServiceImplTest {
 
     @Test
     void cancelShouldSetCanceledWhenBookerCancelsFutureBooking() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.APPROVED);
@@ -204,12 +210,10 @@ public class BookingServiceImplTest {
 
     @Test
     void cancelShouldFailWhenNotBooker() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        User other = saveUser("Other", "other@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        User other = saveUser(OTHER_NAME, OTHER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.APPROVED);
@@ -221,11 +225,9 @@ public class BookingServiceImplTest {
 
     @Test
     void cancelShouldReturnSameWhenAlreadyCanceled() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.CANCELED);
@@ -236,11 +238,9 @@ public class BookingServiceImplTest {
 
     @Test
     void cancelShouldFailWhenBookingFinished() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.minusDays(2), now.minusDays(1), BookingStatus.APPROVED);
@@ -252,11 +252,9 @@ public class BookingServiceImplTest {
 
     @Test
     void cancelShouldFailWhenBookingRejected() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.REJECTED);
@@ -268,11 +266,9 @@ public class BookingServiceImplTest {
 
     @Test
     void getByIdShouldAllowOwnerAndBooker() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.WAITING);
@@ -286,12 +282,10 @@ public class BookingServiceImplTest {
 
     @Test
     void getByIdShouldFailForThirdUser() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
-        User other = saveUser("Other", "other@mail.com");
-        Item item = saveItem(owner, "Drill", true);
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
+        User other = saveUser(OTHER_NAME, OTHER_EMAIL);
+        Item item = saveItem(owner, DRILL_NAME, true);
 
         Booking booking = saveBooking(item, booker,
                 now.plusDays(1), now.plusDays(2), BookingStatus.WAITING);
@@ -303,10 +297,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getByBookerShouldReturnBookingsByState() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
+        User owner = saveUser(OWNER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
 
         Item item1 = saveItem(owner, "Item1", true);
         Item item2 = saveItem(owner, "Item2", true);
@@ -342,10 +334,8 @@ public class BookingServiceImplTest {
 
     @Test
     void getByOwnerShouldReturnBookingsByState() {
-        LocalDateTime now = LocalDateTime.now();
-
-        User owner = saveUser("Owner", "owner@mail.com");
-        User booker = saveUser("Booker", "booker@mail.com");
+        User owner = saveUser(OTHER_NAME, OWNER_EMAIL);
+        User booker = saveUser(BOOKER_NAME, BOOKER_EMAIL);
 
         Item item1 = saveItem(owner, "Item1", true);
         Item item2 = saveItem(owner, "Item2", true);

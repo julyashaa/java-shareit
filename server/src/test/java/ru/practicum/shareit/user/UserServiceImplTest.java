@@ -68,7 +68,7 @@ public class UserServiceImplTest {
 
         assertThat(updated.getId()).isEqualTo(saved.getId());
         assertThat(updated.getName()).isEqualTo("New");
-        assertThat(updated.getEmail()).isEqualTo("old@mail.com"); // email не трогали
+        assertThat(updated.getEmail()).isEqualTo("old@mail.com");
     }
 
     @Test
