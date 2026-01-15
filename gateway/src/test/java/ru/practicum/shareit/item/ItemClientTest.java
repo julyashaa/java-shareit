@@ -24,6 +24,7 @@ public class ItemClientTest {
 
     private MockRestServiceServer server;
     private ItemClient client;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @BeforeEach
     void setUp() {
@@ -57,7 +58,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(header(USER_ID_HEADER, String.valueOf(userId)))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         client.add(userId, new ItemCreateDto());
@@ -72,7 +73,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items/" + itemId))
                 .andExpect(method(HttpMethod.PATCH))
-                .andExpect(header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(header(USER_ID_HEADER, String.valueOf(userId)))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         client.update(userId, itemId, new ItemUpdateDto());
@@ -87,7 +88,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items/" + itemId))
                 .andExpect(method(HttpMethod.GET))
-                .andExpect(header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(header(USER_ID_HEADER, String.valueOf(userId)))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         client.getById(userId, itemId);
@@ -101,7 +102,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items"))
                 .andExpect(method(HttpMethod.GET))
-                .andExpect(header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(header(USER_ID_HEADER, String.valueOf(userId)))
                 .andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
 
         client.getAll(userId);
@@ -115,7 +116,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items/search?text=" + text))
                 .andExpect(method(HttpMethod.GET))
-                .andExpect(headerDoesNotExist("X-Sharer-User-Id"))
+                .andExpect(headerDoesNotExist(USER_ID_HEADER))
                 .andRespond(withSuccess("[]", MediaType.APPLICATION_JSON));
 
         client.search(text);
@@ -130,7 +131,7 @@ public class ItemClientTest {
 
         server.expect(once(), requestTo("http://localhost:9090/items/" + itemId + "/comment"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(header("X-Sharer-User-Id", String.valueOf(userId)))
+                .andExpect(header(USER_ID_HEADER, String.valueOf(userId)))
                 .andRespond(withSuccess("{}", MediaType.APPLICATION_JSON));
 
         client.addComment(userId, itemId, new CommentCreateDto());

@@ -17,28 +17,29 @@ import java.util.List;
 public class ItemRequestController {
 
     private final ItemRequestService itemRequestService;
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
     @PostMapping
-    public ItemRequestDto create(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemRequestDto create(@RequestHeader(USER_ID_HEADER) long userId,
                                  @RequestBody ItemRequestCreateDto dto) {
         return itemRequestService.create(userId, dto);
     }
 
     // GET /requests
     @GetMapping
-    public List<ItemRequestDto> getOwn(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemRequestDto> getOwn(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemRequestService.getOwn(userId);
     }
 
     // GET /requests/all
     @GetMapping("/all")
-    public List<ItemRequestDto> getOthers(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemRequestDto> getOthers(@RequestHeader(USER_ID_HEADER) long userId) {
         return itemRequestService.getOthers(userId);
     }
 
     // GET /requests/{requestId}
     @GetMapping("/{requestId}")
-    public ItemRequestDto getById(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemRequestDto getById(@RequestHeader(USER_ID_HEADER) long userId,
                                   @PathVariable long requestId) {
         return itemRequestService.getById(userId, requestId);
     }
